@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lab4-10 GPS Mapping | HEPTA-SAT TRAINING</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar"><div class="brand"><b>H</b><div><small>HEPTA-SAT TRAINING</small><strong>Lab4-10 GPS Mapping</strong></div></div><div class="actions"><span id="status" class="status"><i></i>記録データ</span><button id="connect">XBeeに接続</button><button id="jsonLive">JSON更新</button></div></header>
+  <main><section class="hero"><div><small class="orange">GROUND STATION / GPS VISUALIZER</small><h1>いま、どこを飛んでいる？</h1><p>XBeeから受信したHEPTA-SatのNMEAデータをブラウザで解析し、船橋キャンパスの地図へリアルタイム表示します。</p></div><aside><small>データソース</small><strong id="source">サンプルGPS</strong><span id="updated">サンプルデータ</span></aside></section>
+    <section class="metrics"><article><small>取得ポイント</small><b id="count">0</b><span>点</span></article><article><small>最高高度</small><b id="maxAlt">0.0</b><span>m</span></article><article><small>衛星数</small><b id="sats">0</b><span>機</span><em id="fix">Fix待機中</em></article><article><small>最終時刻</small><b id="time">--:--:--</b><span>最新ポイント</span></article></section>
+    <section class="grid"><article class="panel map-panel"><div class="heading"><div><small>LIVE TRACK</small><h2>船橋キャンパス経路</h2></div><span>● 最新位置　━ 経路</span></div><div id="map"></div><footer><span>OpenStreetMap / Leaflet</span><span id="mapCount">0点を表示中</span></footer></article><aside class="side"><article class="panel selected"><small>SELECTED POINT</small><h2 id="selectedTime">未選択</h2><dl><dt>緯度</dt><dd id="lat">--</dd><dt>経度</dt><dd id="lon">--</dd><dt>高度</dt><dd id="alt">--</dd><dt>衛星</dt><dd id="selectedSats">--</dd></dl></article><article class="panel chart"><div class="heading"><div><small>ALTITUDE</small><h2>高度の変化</h2></div><span>m</span></div><div id="bars" class="bars"></div><button id="download" class="download">CSVをダウンロード →</button></article></aside></section>
+    <section class="guide panel"><div><small class="orange">FOR PARTICIPANTS</small><h2>この画面の見方</h2></div><div class="guide-grid"><p><b>01</b><strong>点</strong>はGPSを取得した場所です。オレンジ色が最新位置です。</p><p><b>02</b><strong>線</strong>は取得した順番に点をつないだ経路です。</p><p><b>03</b><strong>XBeeに接続</strong>を押すと、ブラウザがNMEA文字列を直接読み取ります。</p></div></section>
+  </main><footer class="page-footer">Lab4-10-GPS_MAPPING　/　船橋キャンパス実験用</footer>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="app.js"></script>
+</body>
+</html>
