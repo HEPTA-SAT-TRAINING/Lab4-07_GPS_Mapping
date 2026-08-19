@@ -8,10 +8,10 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar"><div class="brand"><b>H</b><div><small>HEPTA-SAT TRAINING</small><strong>Lab4-10 GPS Mapping</strong></div></div><div class="actions"><span id="status" class="status"><i></i>Disconnected</span><button id="connect">Connect XBee</button><button id="jsonLive">Load JSON</button></div></header>
-  <main><section class="intro"><div><small>GPS GROUND STATION</small><h1>Raw data → Mapping</h1><p>Read the NMEA stream from XBee and plot valid GPS fixes on the Funabashi Campus map.</p></div><span id="updated">Sample data</span></section>
-    <section class="split"><article class="panel raw-panel"><div class="panel-head"><div><small>01 / RAW STRING</small><h2>NMEA serial stream</h2></div><button id="clearRaw" class="quiet">Clear</button></div><pre id="rawLog" aria-label="Raw NMEA string">Waiting for NMEA data...</pre><div class="raw-footer"><span id="rawCount">0 lines</span><span>9600 baud</span></div></article><article class="panel map-panel"><div class="panel-head"><div><small>02 / GPS MAPPING</small><h2>Funabashi Campus</h2></div><span id="pointCount">0 points</span></div><div id="map"></div><div class="map-footer"><span>Latest point: <b id="latest">--:--:--</b></span><span>OpenStreetMap / Leaflet</span></div></article></section>
-  </main><footer>Lab4-10-GPS_MAPPING</footer>
+  <header class="topbar"><div class="actions"><span id="status" class="status"><i></i>Disconnected</span><button id="connect">Connect XBee</button></div></header>
+  <main>
+    <section class="split"><article class="panel raw-panel"><div class="panel-head"><h2>Raw data</h2><button id="clearRaw" class="quiet">Clear</button></div><pre id="rawLog" aria-label="Raw NMEA string">Waiting for NMEA data...</pre><div class="raw-footer"><span id="rawCount">0 lines</span></div></article><article class="panel map-panel"><div class="panel-head"><h2>Map</h2><span id="pointCount">0 points</span></div><div id="map"></div><div class="map-footer"><span>Latest: <b id="latest">--:--:--</b></span><span>OpenStreetMap / Leaflet</span></div></article></section>
+  </main>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="app.js"></script>
 </body>
 </html>
