@@ -1,10 +1,10 @@
-# Lab4-10-GPS_MAPPING
+# Lab4-07_GPS_Mapping
 
 HEPTA-Sat GPS mapping for Funabashi Campus.
 
 Open in Chrome, Edge, or Firefox (no install required). Safari is not supported.
 
-https://hepta-sat-training.github.io/Lab4-10-GPS_MAPPING/
+https://hepta-sat-training.github.io/Lab4-07_GPS_Mapping/
 
 Click Select & Change Port and choose your COM port in the browser dialog (baud rate 38400)
 Read serial output in the main pane
