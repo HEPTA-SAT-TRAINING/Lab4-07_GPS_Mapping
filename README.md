@@ -1,6 +1,6 @@
 # Lab4-07_GPS_Mapping
 
-HEPTA-Sat GPS mapping for Funabashi Campus.
+HEPTA-Sat GPS mapping for the training kit.
 
 Open in Chrome or Edge (no install required). Web Serial is not supported by Safari or Firefox.
 
@@ -11,6 +11,8 @@ https://hepta-sat-training.github.io/Lab4-07_GPS_Mapping/
 3. Connect the training kit either by USB (the kit's USB serial interface) .
 4. Click Save Processed Log to save the processed GPS output as a text file.
 Click Disconnect when you need to release the port for other apps
+
+The map starts with a world view. When the first GPS fix arrives it jumps to that location, then follows later points so the page works outside any one campus.
 
 ## GPS status table
 
@@ -24,5 +26,5 @@ Only positions with `fix > 0` are added to the track. Speed is displayed in m/s,
 ## Library and map references
 
 - [Leaflet 1.9.4](https://leafletjs.com/) for the interactive map
-- [OpenStreetMap](https://www.openstreetmap.org/copyright) map tiles and attribution
+- [OpenFreeMap](https://openfreemap.org/) / [OpenStreetMap](https://www.openstreetmap.org/copyright) vector tiles (English / Latin labels when available)
 - NMEA 0183 sentence parsing follows the GPS receiver output used by the HEPTA-SAT training kit

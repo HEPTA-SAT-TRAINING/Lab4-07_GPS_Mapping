@@ -1,8 +1,19 @@
 let points = [], processedLines = [], port = null, reader = null, liveStarted = false;
 const telemetry = { fix: false, satellitesUsed: 0, satellitesInView: 0, latitude: null, longitude: null, altitude: null, speed: null, heading: null, hdop: null, timestamp: "--:--:--" };
 const $ = id => document.getElementById(id);
-const map = L.map("map", { zoomControl: false, minZoom: 16, maxZoom: 19 }).setView([35.7227, 140.0593], 17);
+const map = L.map("map", { zoomControl: false, minZoom: 2, maxZoom: 19 }).setView([20, 0], 2);
 L.control.zoom({ position: "bottomright" }).addTo(map);
+const trackZoom = 17;
+function updateMapView() {
+  if (!points.length) return;
+  const latest = points[points.length - 1];
+  const latlng = L.latLng(latest.latitude, latest.longitude);
+  if (points.length === 1) {
+    map.setView(latlng, trackZoom);
+    return;
+  }
+  if (!map.getBounds().pad(-0.25).contains(latlng)) map.panTo(latlng);
+}
 const latinLabel = ["coalesce", ["get", "name:en"], ["get", "name:latin"], ["get", "name:ja-Latn"], ""];
 const glLayer = L.maplibreGL({
   style: "https://tiles.openfreemap.org/styles/liberty",
@@ -63,7 +74,7 @@ function renderTelemetry() {
   const fixCell = $("telemetry-fix"); if (fixCell) fixCell.className = `telemetry-value ${telemetry.fix ? "is-fixed" : "is-waiting"}`;
 }
 function parseNmea(line) { line = addChecksum(cleanNmea(line)); if (!line || !validChecksum(line)) return null; updateTelemetry(line); const fields = line.split(","); const type = (fields[0] || "").replace(/^\$/, "").split("*")[0]; if (type.endsWith("GGA")) { const latitude = coordinate(fields[2], fields[3]); const longitude = coordinate(fields[4], fields[5]); if (latitude === null || longitude === null || Number(fields[6]) === 0) return null; return { timestamp: fields[1] || "--:--:--", latitude, longitude, altitude_m: Number(fields[9]) || 0, satellites: Number(fields[7]) || 0, fix: 1, raw: line }; } if (type.endsWith("RMC") && fields[2] === "A") { const latitude = coordinate(fields[3], fields[4]); const longitude = coordinate(fields[5], fields[6]); if (latitude === null || longitude === null) return null; return { timestamp: fields[1] || "--:--:--", latitude, longitude, altitude_m: 0, satellites: telemetry.satellitesUsed, fix: 1, raw: line }; } return null; }
-function render() { layer.clearLayers(); const locations = points.map(point => [point.latitude, point.longitude]); if (locations.length > 1) L.polyline(locations, { color: "#0b6e69", weight: 4, opacity: .9 }).addTo(layer); points.forEach((point, index) => { const latest = index === points.length - 1; const marker = L.circleMarker([point.latitude, point.longitude], { radius: latest ? 8 : 5, color: latest ? "#f26b38" : "#0b6e69", fillColor: latest ? "#f26b38" : "#8bd4c7", fillOpacity: 1, weight: 2 }).addTo(layer); marker.bindPopup(`<strong>${latest ? "Latest point" : `GPS point ${index + 1}`}</strong><br>${point.timestamp}<br>Altitude ${point.altitude_m.toFixed(1)} m<br>Satellites ${point.satellites}`); }); const processedLog = $("processedLog"); processedLog.textContent = processedLines.slice(-200).join("\n") || "Waiting for processed GPS data..."; if ($("autoScroll").checked) processedLog.scrollTop = processedLog.scrollHeight; renderTelemetry(); }
+function render() { layer.clearLayers(); const locations = points.map(point => [point.latitude, point.longitude]); if (locations.length > 1) L.polyline(locations, { color: "#0b6e69", weight: 4, opacity: .9 }).addTo(layer); points.forEach((point, index) => { const latest = index === points.length - 1; const marker = L.circleMarker([point.latitude, point.longitude], { radius: latest ? 8 : 5, color: latest ? "#f26b38" : "#0b6e69", fillColor: latest ? "#f26b38" : "#8bd4c7", fillOpacity: 1, weight: 2 }).addTo(layer); marker.bindPopup(`<strong>${latest ? "Latest point" : `GPS point ${index + 1}`}</strong><br>${point.timestamp}<br>Altitude ${point.altitude_m.toFixed(1)} m<br>Satellites ${point.satellites}`); }); updateMapView(); const processedLog = $("processedLog"); processedLog.textContent = processedLines.slice(-200).join("\n") || "Waiting for processed GPS data..."; if ($("autoScroll").checked) processedLog.scrollTop = processedLog.scrollHeight; renderTelemetry(); }
 function parseProcessedLine(line) {
   if (line.startsWith("GPGGA")) {
     const latitude = numberAfter(line, "lat"), longitude = numberAfter(line, "lon");
@@ -104,4 +115,4 @@ function addPoint(point) {
 async function connect() { if (!("serial" in navigator)) { $("status").textContent = "Web Serial unavailable"; return; } try { port = await navigator.serial.requestPort(); await port.open({ baudRate: 38400 }); reader = port.readable.getReader(); $("connect").textContent = "Disconnect"; let buffer = ""; const decoder = new TextDecoder(); while (true) { const result = await reader.read(); if (result.done) break; buffer += decoder.decode(result.value, { stream: true }); const lines = buffer.split(/\r?\n/); buffer = lines.pop() || ""; lines.forEach(addLine); } } catch (error) { if (error?.name !== "AbortError") console.warn(error); } finally { if (port) { await port.close().catch(() => {}); port = null; reader = null; $("connect").textContent = "Select USB / XBee Port"; } } }
 async function saveBlobWithPicker(blob, suggestedName) { if (typeof window.showSaveFilePicker === "function") { try { const handle = await window.showSaveFilePicker({ suggestedName, types: [{ description: "Text file", accept: { "text/plain": [".txt"] } }] }); const writable = await handle.createWritable(); await writable.write(blob); await writable.close(); return handle.name; } catch (error) { if (error?.name === "AbortError") throw error; } } const url = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = url; anchor.download = suggestedName; anchor.click(); URL.revokeObjectURL(url); return suggestedName; }
 async function saveLog() { const text = processedLines.join("\n").trimEnd(); if (!text) return; const timestamp = new Date().toISOString().replace(/[:.]/g, "-"); try { await saveBlobWithPicker(new Blob([text + "\n"], { type: "text/plain;charset=utf-8" }), `hepta_gps_processed_${timestamp}.txt`); } catch (error) { if (error?.name !== "AbortError") console.warn(error); } }
-$("connect").onclick = async () => { if (port) { await reader?.cancel(); return; } await connect(); }; $("saveLog").onclick = saveLog; $("clearRaw").onclick = () => { points = []; processedLines = []; liveStarted = false; render(); }; $("autoScroll").onchange = () => { if ($("autoScroll").checked) { const processedLog = $("processedLog"); processedLog.scrollTop = processedLog.scrollHeight; } }; render();
+$("connect").onclick = async () => { if (port) { await reader?.cancel(); return; } await connect(); }; $("saveLog").onclick = saveLog; $("clearRaw").onclick = () => { points = []; processedLines = []; liveStarted = false; map.setView([20, 0], 2); render(); }; $("autoScroll").onchange = () => { if ($("autoScroll").checked) { const processedLog = $("processedLog"); processedLog.scrollTop = processedLog.scrollHeight; } }; render();
