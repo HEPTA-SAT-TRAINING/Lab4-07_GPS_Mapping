@@ -3,7 +3,25 @@ const telemetry = { fix: false, satellitesUsed: 0, satellitesInView: 0, latitude
 const $ = id => document.getElementById(id);
 const map = L.map("map", { zoomControl: false, minZoom: 16, maxZoom: 19 }).setView([35.7227, 140.0593], 17);
 L.control.zoom({ position: "bottomright" }).addTo(map);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map);
+const latinLabel = ["coalesce", ["get", "name:en"], ["get", "name:latin"], ["get", "name:ja-Latn"], ""];
+const glLayer = L.maplibreGL({
+  style: "https://tiles.openfreemap.org/styles/liberty",
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://openfreemap.org/">OpenFreeMap</a>'
+}).addTo(map);
+const glMap = glLayer.getMaplibreMap();
+let labelsApplied = false;
+function hideJapaneseLabels() {
+  if (labelsApplied) return;
+  const style = glMap.getStyle();
+  if (!style || !style.layers) return;
+  style.layers.forEach(layer => {
+    if (!layer.layout || layer.layout["text-field"] === undefined) return;
+    if (/shield/i.test(layer.id)) return;
+    glMap.setLayoutProperty(layer.id, "text-field", latinLabel);
+  });
+  labelsApplied = true;
+}
+glMap.on("idle", hideJapaneseLabels);
 const layer = L.layerGroup().addTo(map);
 function coordinate(value, direction) { if (!value || !direction) return null; const size = direction === "N" || direction === "S" ? 2 : 3; const degrees = Number(value.slice(0, size)); const minutes = Number(value.slice(size)); if (!Number.isFinite(degrees) || !Number.isFinite(minutes)) return null; const result = degrees + minutes / 60; return direction === "S" || direction === "W" ? -result : result; }
 function numberAfter(line, key) { const match = line.match(new RegExp(`\\b${key}=([-+]?\\d*\\.?\\d+)`)); return match ? Number(match[1]) : null; }
