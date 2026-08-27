@@ -6,9 +6,9 @@ Open in Chrome or Edge (no install required). Web Serial is not supported by Saf
 
 https://hepta-sat-training.github.io/Lab4-07_GPS_Mapping/
 
-1. Connect the training kit either by USB (the kit's USB serial interface) or by an XBee USB adapter.
+1. Run `Lab4-06_Parse_GPGGA_and_GPRMC.ino` on the kit. The page reads its processed `GPGGA` and `GPRMC` lines, shows them in the main pane, and plots fixed GPGGA positions on the map.
 2. Click Select USB / XBee Port and choose the serial port in the browser dialog (baud rate 38400).
-3. Run `Lab4-06_Parse_GPGGA_and_GPRMC.ino` on the kit. The page reads its processed `GPGGA` and `GPRMC` lines, shows them in the main pane, and plots fixed GPGGA positions on the map.
+3. Connect the training kit either by USB (the kit's USB serial interface) .
 4. Click Save Processed Log to save the processed GPS output as a text file.
 Click Disconnect when you need to release the port for other apps
 
